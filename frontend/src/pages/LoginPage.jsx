@@ -1,51 +1,60 @@
+/*
+ * SignIn.jsx — student login view
+ * Collects email and password, authenticates via API, stores session
+ */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import client, { setAuthToken } from "../api/client";
+import httpClient, { applyToken } from "../api/client";
 
-const LoginPage = () => {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+function SignIn() {
+  const go = useNavigate();
+  const [fields, setFields] = useState({ email: "", password: "" });
+  const [errMsg, setErrMsg] = useState("");
 
-  const handleChange = (event) => {
-    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
-  };
+  /* keep form fields in sync */
+  function onFieldChange(ev) {
+    const { name, value } = ev.target;
+    setFields((prev) => ({ ...prev, [name]: value }));
+  }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
+  /* submit credentials to the backend */
+  async function onFormSubmit(ev) {
+    ev.preventDefault();
+    setErrMsg("");
 
     try {
-      const response = await client.post("/api/auth/login", form);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("studentName", response.data.student.name);
-      setAuthToken(response.data.token);
-      navigate("/courses");
-    } catch (requestError) {
-      setError(requestError.response?.data?.message || "Login failed");
+      const { data } = await httpClient.post("/api/auth/login", fields);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("studentName", data.student.name);
+      applyToken(data.token);
+      go("/dashboard");
+    } catch (err) {
+      setErrMsg(err.response?.data?.message || "Sign-in failed");
     }
-  };
+  }
 
   return (
-    <div className="container">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit} className="form-card">
-        <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-        />
-        {error && <p className="error-text">{error}</p>}
-        <button type="submit">Login</button>
-      </form>
-      <p>
-        New here? <Link to="/register">Register</Link>
-      </p>
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <div className="auth-logo">📚</div>
+        <div>
+          <h1 className="auth-title">Welcome back</h1>
+          <p className="auth-subtitle">Sign in to your CourseHub account</p>
+        </div>
+
+        <form onSubmit={onFormSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <input name="email" type="email" placeholder="Email address" value={fields.email} onChange={onFieldChange} />
+          <input name="password" type="password" placeholder="Password" value={fields.password} onChange={onFieldChange} />
+          {errMsg && <p className="error-text">{errMsg}</p>}
+          <button type="submit" className="btn-primary" style={{ marginTop: "4px" }}>Sign In</button>
+        </form>
+
+        <p className="auth-footer">
+          New here? <Link to="/register">Create an account</Link>
+        </p>
+      </div>
     </div>
   );
-};
+}
 
-export default LoginPage;
+export default SignIn;

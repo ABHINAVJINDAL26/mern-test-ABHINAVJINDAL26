@@ -1,52 +1,59 @@
+/*
+ * SignUp.jsx — new student registration view
+ * Collects name, email, password and creates an account via API
+ */
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import client, { setAuthToken } from "../api/client";
+import httpClient, { applyToken } from "../api/client";
 
-const RegisterPage = () => {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [error, setError] = useState("");
+function SignUp() {
+  const go = useNavigate();
+  const [fields, setFields] = useState({ name: "", email: "", password: "" });
+  const [errMsg, setErrMsg] = useState("");
 
-  const handleChange = (event) => {
-    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
-  };
+  function onFieldChange(ev) {
+    const { name, value } = ev.target;
+    setFields((prev) => ({ ...prev, [name]: value }));
+  }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
+  async function onFormSubmit(ev) {
+    ev.preventDefault();
+    setErrMsg("");
 
     try {
-      const response = await client.post("/api/auth/register", form);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("studentName", response.data.student.name);
-      setAuthToken(response.data.token);
-      navigate("/courses");
-    } catch (requestError) {
-      setError(requestError.response?.data?.message || "Registration failed");
+      const { data } = await httpClient.post("/api/auth/register", fields);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("studentName", data.student.name);
+      applyToken(data.token);
+      go("/dashboard");
+    } catch (err) {
+      setErrMsg(err.response?.data?.message || "Registration failed");
     }
-  };
+  }
 
   return (
-    <div className="container">
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit} className="form-card">
-        <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
-        <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-        />
-        {error && <p className="error-text">{error}</p>}
-        <button type="submit">Create Account</button>
-      </form>
-      <p>
-        Already registered? <Link to="/login">Login</Link>
-      </p>
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <div className="auth-logo">📚</div>
+        <div>
+          <h1 className="auth-title">Create account</h1>
+          <p className="auth-subtitle">Start managing your courses today</p>
+        </div>
+
+        <form onSubmit={onFormSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <input name="name" placeholder="Full name" value={fields.name} onChange={onFieldChange} />
+          <input name="email" type="email" placeholder="Email address" value={fields.email} onChange={onFieldChange} />
+          <input name="password" type="password" placeholder="Password" value={fields.password} onChange={onFieldChange} />
+          {errMsg && <p className="error-text">{errMsg}</p>}
+          <button type="submit" className="btn-primary" style={{ marginTop: "4px" }}>Create Account</button>
+        </form>
+
+        <p className="auth-footer">
+          Already registered? <Link to="/login">Sign in</Link>
+        </p>
+      </div>
     </div>
   );
-};
+}
 
-export default RegisterPage;
+export default SignUp;

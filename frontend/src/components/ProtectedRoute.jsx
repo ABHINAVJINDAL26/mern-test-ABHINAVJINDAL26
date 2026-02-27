@@ -1,8 +1,10 @@
+/* AuthGate — redirects unauthenticated visitors to sign-in */
 import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/login" replace />;
-};
+function AuthGate({ children }) {
+  const jwt = localStorage.getItem("token");
+  if (!jwt) return <Navigate to="/login" replace />;
+  return children;
+}
 
-export default ProtectedRoute;
+export default AuthGate;

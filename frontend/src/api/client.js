@@ -1,17 +1,20 @@
+/*
+ * httpClient.js — pre-configured Axios instance
+ * Centralises base URL and auth-header management
+ */
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-const client = axios.create({
-  baseURL: API_URL,
-});
+const httpClient = axios.create({ baseURL: BASE });
 
-export const setAuthToken = (token) => {
-  if (token) {
-    client.defaults.headers.common.Authorization = `Bearer ${token}`;
+/* attach or detach the Bearer token for all future requests */
+export function applyToken(jwt) {
+  if (jwt) {
+    httpClient.defaults.headers.common.Authorization = `Bearer ${jwt}`;
   } else {
-    delete client.defaults.headers.common.Authorization;
+    delete httpClient.defaults.headers.common.Authorization;
   }
-};
+}
 
-export default client;
+export default httpClient;
