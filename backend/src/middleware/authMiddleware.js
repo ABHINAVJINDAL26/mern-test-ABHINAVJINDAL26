@@ -1,7 +1,4 @@
-/*
- * authMiddleware.js — JWT verification gate
- * Blocks unauthenticated requests and attaches userId to req
- */
+
 import jwt from "jsonwebtoken";
 
 function verifyAccess(req, res, next) {

@@ -1,7 +1,4 @@
-/*
- * database.js — initializes the MongoDB connection pool
- * Uses Mongoose ODM to establish a persistent link
- */
+
 import mongoose from "mongoose";
 
 const initializeDatabase = async () => {

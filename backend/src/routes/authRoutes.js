@@ -1,4 +1,3 @@
-/* authRoutes.js — maps auth endpoints to their handlers */
 import express from "express";
 import { login, register } from "../controllers/authController.js";
 

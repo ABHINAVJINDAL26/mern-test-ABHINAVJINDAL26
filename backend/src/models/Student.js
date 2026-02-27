@@ -1,7 +1,4 @@
-/*
- * StudentModel.js — schema definition for enrolled students
- * Stores credentials and profile metadata
- */
+
 import mongoose from "mongoose";
 
 const studentBlueprint = new mongoose.Schema(

@@ -1,7 +1,4 @@
-/*
- * courseController.js — CRUD logic for academic courses
- * All operations are scoped to the authenticated student
- */
+
 import CourseModel from "../models/Course.js";
 
 /* POST /api/courses — persist a new course entry */

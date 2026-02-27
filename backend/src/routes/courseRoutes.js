@@ -1,4 +1,4 @@
-/* courseRoutes.js — maps course endpoints to their handlers */
+
 import express from "express";
 import { addCourse, listCourses, removeCourse } from "../controllers/courseController.js";
 import verifyAccess from "../middleware/authMiddleware.js";

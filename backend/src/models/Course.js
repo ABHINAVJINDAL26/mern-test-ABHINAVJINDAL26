@@ -1,7 +1,4 @@
-/*
- * CourseModel.js — schema for academic courses
- * Each course is linked to the student who created it
- */
+
 import mongoose from "mongoose";
 
 const courseBlueprint = new mongoose.Schema({

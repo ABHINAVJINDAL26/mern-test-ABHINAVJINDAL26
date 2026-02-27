@@ -1,33 +1,30 @@
-/*
- * authController.js — handles student sign-up and sign-in
- * Issues JWT tokens upon successful authentication
- */
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import StudentModel from "../models/Student.js";
 
-/* Helper: mint a signed JWT for the given user id */
+
 function mintToken(uid) {
   return jwt.sign({ userId: uid }, process.env.JWT_SECRET, { expiresIn: "7d" });
 }
 
-/* POST /api/auth/register — create a new student account */
+
 export async function register(req, res) {
   try {
     const { name, email, password } = req.body;
 
-    /* validate presence of all required fields */
+
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Please fill in every field" });
     }
 
-    /* guard against duplicate emails */
+  
     const duplicate = await StudentModel.findOne({ email });
     if (duplicate) {
       return res.status(400).json({ message: "This email is already taken" });
     }
 
-    /* hash the raw password before persisting */
+ 
     const saltRounds = 10;
     const encryptedPwd = await bcrypt.hash(password, saltRounds);
 
