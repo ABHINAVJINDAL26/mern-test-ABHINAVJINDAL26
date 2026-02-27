@@ -14,15 +14,31 @@ initializeDatabase();
 
 const app = express();
 
+const normalizeOrigin = (origin) => origin.replace(/\/$/, "");
+
 const allowedOrigins = (process.env.CORS_ORIGIN || "")
   .split(",")
   .map((origin) => origin.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
 
 
 app.use(
   cors({
-    origin: allowedOrigins.length ? allowedOrigins : true,
+    origin: (origin, callback) => {
+      if (!origin || !allowedOrigins.length) {
+        callback(null, true);
+        return;
+      }
+
+      const requestOrigin = normalizeOrigin(origin);
+      if (allowedOrigins.includes(requestOrigin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
   })
 );
 app.use(express.json());
