@@ -1,13 +1,18 @@
+/*
+ * database.js — initializes the MongoDB connection pool
+ * Uses Mongoose ODM to establish a persistent link
+ */
 import mongoose from "mongoose";
 
-const connectDB = async () => {
+const initializeDatabase = async () => {
+  const uri = process.env.MONGO_URI;
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB connected");
-  } catch (error) {
-    console.error("MongoDB connection failed:", error.message);
+    const conn = await mongoose.connect(uri);
+    console.log(`DB ready → ${conn.connection.host}`);
+  } catch (err) {
+    console.error("DB init failed:", err.message);
     process.exit(1);
   }
 };
 
-export default connectDB;
+export default initializeDatabase;
